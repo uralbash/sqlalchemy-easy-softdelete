@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 from sqlalchemy import func, insert, select, table, text
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import Query, aliased
 from sqlalchemy.sql import Select
 
 from tests.model import (
@@ -222,3 +222,13 @@ def test_query_with_same_field_as_softdelete_field_but_ignored(seeded_session, r
         )
         is False
     )
+
+
+def test_query_with_aliased_join(snapshot, seeded_session, rewriter):
+    """Query with a simple join"""
+    sdparent_alias = aliased(SDParent)
+    test_query: Query = seeded_session.query(SDChild).join(sdparent_alias)  # noqa -- wrong typing stub in SA
+
+    soft_deleted_rewritten_statement = rewriter.rewrite_statement(test_query.statement)
+
+    snapshot.assert_match(sorted(test_query.all(), key=lambda i: i.id))

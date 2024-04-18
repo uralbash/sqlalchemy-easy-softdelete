@@ -46,6 +46,14 @@ snapshots['test_query_union_sdchild 1'] = [
     GenericRepr('<SDChild id=100204 deleted=False (parent_id=1002)>')
 ]
 
+snapshots['test_query_with_aliased_join 1'] = [
+    GenericRepr('<SDChild id=100000 deleted=False (parent_id=1000)>'),
+    GenericRepr('<SDChild id=100001 deleted=False (parent_id=1000)>'),
+    GenericRepr('<SDChild id=100002 deleted=False (parent_id=1000)>'),
+    GenericRepr('<SDChild id=100003 deleted=False (parent_id=1000)>'),
+    GenericRepr('<SDChild id=100100 deleted=False (parent_id=1001)>')
+]
+
 snapshots['test_query_with_join 1'] = [
     GenericRepr('<SDChild id=100000 deleted=False (parent_id=1000)>'),
     GenericRepr('<SDChild id=100001 deleted=False (parent_id=1000)>'),

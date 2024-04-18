@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Union
 
 from sqlalchemy.orm.util import _ORMJoin
+from sqlalchemy.sql.annotation import AnnotatedAlias
 from sqlalchemy.sql.schema import Table
 from sqlalchemy.sql.selectable import CompoundSelect, Join, Select, SelectBase, Subquery
 
@@ -15,12 +16,12 @@ from sqlalchemy.sql.selectable import CompoundSelect, Join, Select, SelectBase, 
 def is_simple_join(j: Union[Join, _ORMJoin]) -> bool:
     left_simple, right_simple = False, False
 
-    if isinstance(j.left, Table):
+    if isinstance(j.left, Table) or isinstance(j.left, AnnotatedAlias):
         left_simple = True
     elif isinstance(j.left, _ORMJoin) or isinstance(j.left, Join):
         left_simple = is_simple_join(j.left)
 
-    if isinstance(j.right, Table):
+    if isinstance(j.right, Table) or isinstance(j.right, AnnotatedAlias):
         right_simple = True
     elif isinstance(j.right, _ORMJoin) or isinstance(j.right, Join):
         right_simple = is_simple_join(j.right)
@@ -41,6 +42,8 @@ def is_simple_select(s: Union[Select, Subquery, CompoundSelect]) -> bool:
 
     for from_obj in final_froms:
         if isinstance(from_obj, Table):
+            continue
+        if isinstance(from_obj, AnnotatedAlias):
             continue
         elif isinstance(from_obj, Subquery):
             return False
@@ -66,6 +69,8 @@ def extract_simple_selects(statement: Select | CompoundSelect | SelectBase) -> l
 
     for from_obj in statement.get_final_froms():
         if isinstance(from_obj, Table):
+            continue
+        elif isinstance(from_obj, AnnotatedAlias):
             continue
         elif isinstance(from_obj, Subquery):
             return extract_simple_selects(from_obj.element)

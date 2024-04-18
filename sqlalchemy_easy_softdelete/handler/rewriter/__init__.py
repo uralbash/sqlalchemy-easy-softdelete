@@ -8,6 +8,7 @@ from sqlalchemy import Table
 from sqlalchemy.orm import FromStatement
 from sqlalchemy.orm.util import _ORMJoin
 from sqlalchemy.sql import Alias, CompoundSelect, Executable, Join, Select, Subquery, TableClause
+from sqlalchemy.sql.annotation import AnnotatedAlias
 from sqlalchemy.sql.elements import TextClause
 
 from sqlalchemy_easy_softdelete.hook import IgnoredTable
@@ -106,10 +107,14 @@ class SoftDeleteQueryRewriter:
             stmt = self.rewrite_from_orm_join(stmt, join_obj.right)
 
         # Normal cases - Tables
-        if isinstance(join_obj.left, Table):
+        if isinstance(join_obj.left, Table) or (
+            isinstance(join_obj.left, AnnotatedAlias) and isinstance(join_obj.left.element, Table)
+        ):
             stmt = self.rewrite_from_table(stmt, join_obj.left)
 
-        if isinstance(join_obj.right, Table):
+        if isinstance(join_obj.right, Table) or (
+            isinstance(join_obj.right, AnnotatedAlias) and isinstance(join_obj.right.element, Table)
+        ):
             stmt = self.rewrite_from_table(stmt, join_obj.right)
 
         return stmt
